@@ -1,0 +1,27 @@
+---
+# tasks file for sshd-configurations
+- name: Check bckp directory
+  stat:
+    path: '/root/backp_{{ date }}'
+  register: directory_data
+
+- name: Create backup directory if it doesn't exist
+  file:
+    path: '/root/backp_{{ date }}'
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+  when: not directory_data.stat.exists
+
+- name: Copy ssh banner
+  template:
+    src: sshd_banner.j2
+    dest: /etc/ssh/sshd-banner
+    group: root
+    owner: root
+    mode: '0600'
+
+- name: Copy sshd_configuration
+  include_tasks: sshd_configuration
+
